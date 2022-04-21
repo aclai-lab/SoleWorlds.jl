@@ -1,5 +1,11 @@
 module SoleWorlds
 
+# imports/usings
+import Base: show
+
+# exports
+export IntervalWorld, RectangleWorld, CubeWorld
+
 #abstract types
 abstract type AbstractWorld end
 abstract type ShapeWorld    <: AbstractWorld end
@@ -9,29 +15,26 @@ struct PointWorld           <: AbstractWorld
     coord::Real
 end
 
-struct HyperRectangle{N}    <: ShapeWorld
+struct HyperRectangleWorld{N}    <: ShapeWorld
     coords::Vector{<:NTuple{2,<:Real}}
 
-    function HyperRectangle{N}(coords::Vector{<:NTuple{2,<:Real}}) where N
-        @assert N == length(coords)
+    function HyperRectangleWorld{N}(coords::Vector{<:NTuple{2,<:Real}}) where N
+        @assert N == length(coords) "N=$N is not equal to length(coords)=$(length(coords))"
         return new{N}(coords)
     end
 
-    function HyperRectangle(coords::Vector{<:NTuple{2,<:Real}})
-        return HyperRectangle{length(coords)}(coords)
+    function HyperRectangleWorld(coords::Vector{<:NTuple{2,<:Real}})
+        return HyperRectangleWorld{length(coords)}(coords)
     end
 end
 
-#alias
-const Intervall         = HyperRectangle{1}
-const Rectangle         = HyperRectangle{2}
-const Parallelepiped    = HyperRectangle{3}
+#aliases
+const IntervalWorld  = HyperRectangleWorld{1}
+const RectangleWorld = HyperRectangleWorld{2}
+const CubeWorld      = HyperRectangleWorld{3}
 
 #shows
-show(world::PointWorld)      = println(typeof(World)," with values ",world.coord)
-show(world::HyperRectangle)  = println(typeof(world)," with values ",world.coords)
-show(world::Intervall)       = println(typeof(world)," with values ",world.coords)
-show(world::Rectangle)       = println(typeof(world)," with values ",world.coords)
-show(world::Intervall)       = println(typeof(world)," with values ",world.coords)
+show(io::IO, w::PointWorld)                         = print(io, typeof(w), ": ", w.coord)
+show(io::IO, w::T) where T<:HyperRectangleWorld     = print(io, typeof(w), ": ", w.coords)
 
 end
