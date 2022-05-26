@@ -66,4 +66,14 @@ function worldGen(d::NTuple{3,Int64})
     ]
 end
 
+function world_gen(npoints::NTuple{N,Int}) where N
+    H = Dict();
+
+    for i in 1:N
+        H[i] = worldGen(npoints[i]);
+    end
+
+    return vec(collect(Iterators.product([H[i] for i in 1:N]...)));
+end
+
 end
