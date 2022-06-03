@@ -1,22 +1,21 @@
 module SoleWorlds
 
-# imports/usings
 using Base.Cartesian
-
 import Base: show
 import IterTools
 
-# exports
 export IntervalWorld, RectangleWorld, CubeWorld
 
-# abstract types
 abstract type AbstractWorld end
 abstract type ShapeWorld    <: AbstractWorld end
 
-# concrete types
 struct Worlds <: AbstractArray{AbstractWorld, 1}
     worlds::AbstractArray{AbstractWorld, 1}
 end
+Base.size(ws::Worlds) = (length(ws.worlds),)
+Base.IndexStyle(::Type{<:Worlds}) = IndexLinear()
+Base.getindex(ws::Worlds, i::Int) = ws.worlds[i]
+Base.setindex!(ws::Worlds, w::AbstractWorld, i::Int) = ws.worlds[i] = w
 
 struct PointWorld           <: AbstractWorld
     coord::Real
@@ -35,12 +34,10 @@ struct HyperRectangleWorld{N}    <: ShapeWorld
     end
 end
 
-# aliases
 const IntervalWorld  = HyperRectangleWorld{1}
 const RectangleWorld = HyperRectangleWorld{2}
 const CubeWorld      = HyperRectangleWorld{3}
 
-#shows
 show(io::IO, w::PointWorld)                         = print(io, typeof(w), ": ", w.coord)
 show(io::IO, w::T) where T<:HyperRectangleWorld     = print(io, typeof(w), ": ", w.coords)
 
@@ -93,7 +90,7 @@ function dimensional_permutations(A::NTuple{N,Int}) where {N}
     eval(exp)
 end
 
-# worlds generators
+# Generate all the subspaces of a N-dimensional space.
 function world_gen(d::Int)
     return [PointWorld(i) for i in 1:d]
 end
@@ -104,18 +101,15 @@ end
 
 # TESTS
 
-# Different types of world coexist
-# w = Worlds( vcat( world_gen((5)), world_gen((6,9)) , world_gen((4,2,4)) ) )
-# @show w.worlds
+# A single call to world_gen does generate subspaces of dimension N
+# but using Worlds constructor we can join different world types
+w = Worlds( vcat( world_gen((5)), world_gen((6,9)) , world_gen((4,2,4)) ) )
+@show w
 
 # w = Worlds( world_gen((3,3)) )
 # @show w.worlds
 
-w = world_gen((3,3))
-@show w
+# w = world_gen((3,3))
+# @show w
 
 end
-
-# Notes
-# Maybe some Int type could be changed in Int16 or UInt;
-# all in all the default Int64 is a waste of memory
