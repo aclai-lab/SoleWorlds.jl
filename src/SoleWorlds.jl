@@ -59,7 +59,7 @@ show(io::IO, w::T) where T<:HyperRectangleWorld     = print(io, typeof(w), ": ",
 #
 # https://docs.julialang.org/en/v1/devdocs/cartesian/#Anonymous-function-expressions-as-macro-arguments
 
-function dimensional_permutations(A::NTuple{N,Int64}) where {N}
+function dimensional_permutations(A::NTuple{N,Int}) where {N}
     # This is the only way i have found to generate new variable names
     # in the same row while also grouping them in a vector.
     # [i_1 , i_2 , i_3 , ... , i_N]
@@ -94,11 +94,11 @@ function dimensional_permutations(A::NTuple{N,Int64}) where {N}
 end
 
 # worlds generators
-function world_gen(d::Int64)
+function world_gen(d::Int)
     return [PointWorld(i) for i in 1:d]
 end
 
-function world_gen(npoints::NTuple{N,Int64}) where N
+function world_gen(npoints::NTuple{N,Int}) where N
     return dimensional_permutations(npoints)
 end
 
@@ -115,3 +115,7 @@ w = world_gen((3,3))
 @show w
 
 end
+
+# Notes
+# Maybe some Int type could be changed in Int16 or UInt;
+# all in all the default Int64 is a waste of memory
