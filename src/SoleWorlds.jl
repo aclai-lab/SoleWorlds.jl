@@ -92,7 +92,7 @@ end
 
 # Generate all the subspaces of a N-dimensional space.
 function world_gen(d::Int)
-    return [PointWorld(i) for i in 1:d]
+    return vcat( [PointWorld(i) for i in 1:d], dimensional_permutations(NTuple{1,Int}(d)) )
 end
 
 function world_gen(npoints::NTuple{N,Int}) where N
@@ -103,13 +103,13 @@ end
 
 # A single call to world_gen does generate subspaces of dimension N
 # but using Worlds constructor we can join different world types
-w = Worlds( vcat( world_gen((5)), world_gen((6,9)) , world_gen((4,2,4)) ) )
-@show w
+# w = Worlds( vcat( world_gen((5)), world_gen((6,9)) , world_gen((4,2,4)) ) )
+# @show w.worlds[8]
 
 # w = Worlds( world_gen((3,3)) )
 # @show w.worlds
 
-# w = world_gen((3,3))
-# @show w
+w = world_gen((3))
+@show w
 
 end
