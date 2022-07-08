@@ -4,7 +4,7 @@ abstract type ShapeWorld    <: AbstractWorld end
 struct Worlds <: AbstractArray{AbstractWorld, 1}
     worlds::AbstractArray{AbstractWorld, 1}
 end
-Base.size(ws::Worlds) = (length(ws.worlds),)
+Base.size(ws::Worlds) = (length(ws.worlds))
 Base.IndexStyle(::Type{<:Worlds}) = IndexLinear()
 Base.getindex(ws::Worlds, i::Int) = ws.worlds[i]
 Base.setindex!(ws::Worlds, w::AbstractWorld, i::Int) = ws.worlds[i] = w
