@@ -53,7 +53,7 @@ function dimensional_permutations(A::NTuple{N,Int}) where {N}
     # in the same row while also grouping them in a vector.
     # [i_1 , i_2 , i_3 , ... , i_N]
     function variables(kwargs...)
-        return [ kwargs[i] for i in 1:length(kwargs) ]
+        return [ kwargs[i] for i in eachindex(kwargs) ]
     end
 
     # Collecting all the possible permutations here is computationally expensive.
