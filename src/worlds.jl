@@ -1,5 +1,9 @@
 abstract type AbstractWorld end
-abstract type ShapeWorld    <: AbstractWorld end
+abstract type ShapeWorld <: AbstractWorld end
+
+# TODO: change `coords` type in HyperRectangleWorld into NTuple{N,<:NTuple{2,<:Real}}
+# it may be faster (see julia performance tips)
+# https://docs.julialang.org/en/v1/manual/performance-tips/#man-performance-abstract-container
 
 struct Worlds <: AbstractArray{AbstractWorld, 1}
     worlds::AbstractArray{AbstractWorld, 1}
@@ -9,11 +13,11 @@ Base.IndexStyle(::Type{<:Worlds}) = IndexLinear()
 Base.getindex(ws::Worlds, i::Int) = ws.worlds[i]
 Base.setindex!(ws::Worlds, w::AbstractWorld, i::Int) = ws.worlds[i] = w
 
-struct PointWorld           <: AbstractWorld
+struct PointWorld <: AbstractWorld
     coord::Real
 end
 
-struct HyperRectangleWorld{N}    <: ShapeWorld
+struct HyperRectangleWorld{N} <: ShapeWorld
     coords::Vector{<:NTuple{2,<:Real}}
 
     function HyperRectangleWorld{N}(coords::Vector{<:NTuple{2,<:Real}}) where N
