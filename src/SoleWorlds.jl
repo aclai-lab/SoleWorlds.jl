@@ -6,6 +6,7 @@ import IterTools
 
 export AbstractWorld, ShapeWorld
 export HyperRectangleWorld, PointWorld, IntervalWorld, RectangleWorld, CubeWorld
+export Worlds
 export world_gen
 
 include("worlds.jl")

@@ -1,24 +1,13 @@
 abstract type AbstractWorld end
 abstract type ShapeWorld <: AbstractWorld end
 
-# TODO: change `coords` type in HyperRectangleWorld into NTuple{N,<:NTuple{2,<:Real}}
-# it may be faster (see julia performance tips)
-# https://docs.julialang.org/en/v1/manual/performance-tips/#man-performance-abstract-container
-
-struct Worlds <: AbstractArray{AbstractWorld, 1}
-    worlds::AbstractArray{AbstractWorld, 1}
-end
-Base.size(ws::Worlds) = (length(ws.worlds))
-Base.IndexStyle(::Type{<:Worlds}) = IndexLinear()
-Base.getindex(ws::Worlds, i::Int) = ws.worlds[i]
-Base.setindex!(ws::Worlds, w::AbstractWorld, i::Int) = ws.worlds[i] = w
-
 struct PointWorld <: AbstractWorld
     coord::Real
 end
+show(io::IO, w::PointWorld) = print(io, typeof(w), ": ", w.coord)
 
 struct HyperRectangleWorld{N} <: ShapeWorld
-    coords::Vector{<:NTuple{2,<:Real}}
+    coords::Vector{<:NTuple{2,<:Real}} # maybe changed into NTuple{N,<:NTuple{2,<:Real}}
 
     function HyperRectangleWorld{N}(coords::Vector{<:NTuple{2,<:Real}}) where N
         @assert N == length(coords) "N=$N is not equal to length(coords)=$(length(coords))"
@@ -29,16 +18,25 @@ struct HyperRectangleWorld{N} <: ShapeWorld
         return HyperRectangleWorld{length(coords)}(coords)
     end
 end
+show(io::IO, w::T) where T<:HyperRectangleWorld = print(io, typeof(w), ": ", w.coords)
 
 const IntervalWorld  = HyperRectangleWorld{1}
 const RectangleWorld = HyperRectangleWorld{2}
 const CubeWorld      = HyperRectangleWorld{3}
 
-show(io::IO, w::PointWorld)                         = print(io, typeof(w), ": ", w.coord)
-show(io::IO, w::T) where T<:HyperRectangleWorld     = print(io, typeof(w), ": ", w.coords)
+#################################
+#           Wrappers            #
+#################################
+struct Worlds{T<:AbstractWorld} <: AbstractArray{T,1}
+    ws::Array{T,1}
+end
+Base.size(ws::Worlds) = (length(ws.ws))
+Base.IndexStyle(::Type{<:Worlds}) = IndexLinear()
+Base.getindex(ws::Worlds, i::Int) = ws.ws[i]
+Base.setindex!(ws::Worlds, w::AbstractWorld, i::Int) = ws.ws[i] = w
+Base.print_array(io, X::Type{<:Worlds}) = print(X.ws)
 
 # Note: this monolitic comment will be shrinked up
-#
 # The following is used to generate a code similar to this
 #
 # return [
