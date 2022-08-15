@@ -27,14 +27,15 @@ const CubeWorld      = HyperRectangleWorld{3}
 #################################
 #           Wrappers            #
 #################################
+# Bisogna mettere l'iterazione
 struct Worlds{T<:AbstractWorld} <: AbstractArray{T,1}
-    ws::Array{T,1}
+    worlds::Array{T,1}
 end
-Base.size(ws::Worlds) = (length(ws.ws))
+Base.size(w::Worlds) = size(w.worlds)
+Base.axes(w::Worlds) = (1:length(w.worlds),)
 Base.IndexStyle(::Type{<:Worlds}) = IndexLinear()
-Base.getindex(ws::Worlds, i::Int) = ws.ws[i]
-Base.setindex!(ws::Worlds, w::AbstractWorld, i::Int) = ws.ws[i] = w
-Base.print_array(io, X::Type{<:Worlds}) = print(X.ws)
+Base.getindex(w::Worlds, i::Int) = w.worlds[i]
+Base.setindex!(w::Worlds, aw::AbstractWorld, i::Int) = w.worlds[i] = aw
 
 # Note: this monolitic comment will be shrinked up
 # The following is used to generate a code similar to this
