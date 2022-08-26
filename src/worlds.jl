@@ -7,22 +7,18 @@ end
 show(io::IO, w::PointWorld) = print(io, typeof(w), ": ", w.coord)
 
 struct HyperRectangleWorld{N} <: ShapeWorld
-    coords::Vector{<:NTuple{2,<:Real}} # maybe changed into NTuple{N,<:NTuple{2,<:Real}}
+    coords::NTuple{N, NTuple{2, Int64}}
 
-    function HyperRectangleWorld{N}(coords::Vector{<:NTuple{2,<:Real}}) where N
+    function HyperRectangleWorld{N}(coords::NTuple{N, NTuple{2, Int64}}) where N
         @assert N == length(coords) "N=$N is not equal to length(coords)=$(length(coords))"
         return new{N}(coords)
-    end
-
-    function HyperRectangleWorld(coords::Vector{<:NTuple{2,<:Real}})
-        return HyperRectangleWorld{length(coords)}(coords)
     end
 end
 show(io::IO, w::T) where T<:HyperRectangleWorld = print(io, typeof(w), ": ", w.coords)
 
-const IntervalWorld  = HyperRectangleWorld{1}
-const RectangleWorld = HyperRectangleWorld{2}
-const CubeWorld      = HyperRectangleWorld{3}
+const IntervalWorld  = HyperRectangleWorld{1} # w = IntervalWorld ( ((x1,x2), ) )
+const RectangleWorld = HyperRectangleWorld{2} # w = RectangleWorld( ((x1,x2), (x3,x4)) )
+const CubeWorld      = HyperRectangleWorld{3} # w = ..
 
 #################################
 #           Wrappers            #
@@ -51,19 +47,20 @@ Base.setindex!(w::Worlds, aw::AbstractWorld, i::Int) = w.worlds[i] = aw
 #
 # https://docs.julialang.org/en/v1/devdocs/cartesian/#Anonymous-function-expressions-as-macro-arguments
 
-function dimensional_permutations(A::NTuple{N,Int}) where {N}
+function _dimensional_permutations(A::NTuple{N,Int}) where {N}
     # This is the only way i have found to generate new variable names
     # in the same row while also grouping them in a vector.
     # [i_1 , i_2 , i_3 , ... , i_N]
     function variables(kwargs...)
-        return [ kwargs[i] for i in eachindex(kwargs) ]
+        return NTuple{N, NTuple{2, Int64}}(kwargs)
+        #return [ kwargs[i] for i in eachindex(kwargs) ]
     end
 
     # Collecting all the possible permutations here is computationally expensive.
     # TODO: a generator could be returned instead.
-    collection = HyperRectangleWorld{N}[];
+    collection = HyperRectangleWorld{N}[]
 
-    # Generates N loop; a loop "shape" is as following
+    # Generate N loop with the following structure
     # " for i_d = IterTools.subsets( [1:A[d]...] , Val(2) ) ... "
     # meaning that variable i_1, i_2, i_3 ... contains a new interesting permutation
     #
@@ -74,7 +71,7 @@ function dimensional_permutations(A::NTuple{N,Int}) where {N}
     # and we cannot exploit some string notation like [ "$(i_d)," for d in 1:N ]
     # see "variables" function and @ncall in Base.Cartesian documentation
 
-    # Please use "@show @macroexpand" to see more details
+    # Use "@show @macroexpand" to see more details
     exp = quote
             @nloops $N i d -> IterTools.subsets( [1:$A[d]...], Val(2) ) begin
                 push!($collection, HyperRectangleWorld{$N}( @ncall $N $variables i ) )
@@ -91,5 +88,5 @@ function world_gen(d::Int)
 end
 
 function world_gen(npoints::NTuple{N,Int}) where N
-    return dimensional_permutations(npoints)
+    return _dimensional_permutations(npoints)
 end
