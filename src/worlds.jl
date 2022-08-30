@@ -32,6 +32,7 @@ Base.axes(w::Worlds) = (1:length(w.worlds),)
 Base.IndexStyle(::Type{<:Worlds}) = IndexLinear()
 Base.getindex(w::Worlds, i::Int) = w.worlds[i]
 Base.setindex!(w::Worlds, aw::AbstractWorld, i::Int) = w.worlds[i] = aw
+Base.push!(w::Worlds, aw::AbstractWorld) = push!(w.worlds, aw)
 
 # Note: this monolitic comment will be shrinked up
 # The following is used to generate a code similar to this
