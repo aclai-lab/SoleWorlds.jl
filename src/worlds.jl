@@ -23,7 +23,7 @@ const CubeWorld      = HyperRectangleWorld{3} # w = ..
 #################################
 #           Wrappers            #
 #################################
-# Bisogna mettere l'iterazione
+
 struct Worlds{T<:AbstractWorld} <: AbstractArray{T,1}
     worlds::Array{T,1}
 end
@@ -34,7 +34,6 @@ Base.getindex(w::Worlds, i::Int) = w.worlds[i]
 Base.setindex!(w::Worlds, aw::AbstractWorld, i::Int) = w.worlds[i] = aw
 Base.push!(w::Worlds, aw::AbstractWorld) = push!(w.worlds, aw)
 
-# Note: this monolitic comment will be shrinked up
 # The following is used to generate a code similar to this
 #
 # return [
@@ -45,7 +44,6 @@ Base.push!(w::Worlds, aw::AbstractWorld) = push!(w.worlds, aw)
 # ]
 #
 # where d is a NTuple collection of dimension N.
-#
 # https://docs.julialang.org/en/v1/devdocs/cartesian/#Anonymous-function-expressions-as-macro-arguments
 
 function _dimensional_permutations(A::NTuple{N,Int}) where {N}
@@ -57,8 +55,6 @@ function _dimensional_permutations(A::NTuple{N,Int}) where {N}
         #return [ kwargs[i] for i in eachindex(kwargs) ]
     end
 
-    # Collecting all the possible permutations here is computationally expensive.
-    # TODO: a generator could be returned instead.
     collection = HyperRectangleWorld{N}[]
 
     # Generate N loop with the following structure
